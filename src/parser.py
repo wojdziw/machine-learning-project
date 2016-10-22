@@ -1,5 +1,4 @@
 import DataPoint
-import nltk
 
 def parseFile(filename, hasAnswers = True):
     '''
@@ -7,17 +6,15 @@ def parseFile(filename, hasAnswers = True):
         hasAnswers - Are there answers to the questions in the file
         returns:
             dataPoints - a list of DataPoint objects - one for each set of statements
-            verbs - alphabetically sorted list of all the verbs in the text
-            nouns - alphabetically sorted list of all the nouns in the text
+            dictionary - alphabetically sorted list of all the words in the text
     '''
-    verbs = set()
-    nouns = set()
+    dictionary = set()
     dataPoints = []
     currentPoint = DataPoint.DataPoint()
     with open(filename, "r") as ins:
         for line in ins:
-            # split on whitespace
-            lst = line.strip().split()
+            # split on whitespace, convert to lowercase
+            lst = list(map(lambda x: x.lower(), line.strip().split()))
 
             # When we see an index of 1, we push the current point and reset it
             if int(lst[0]) == 1:
@@ -36,16 +33,11 @@ def parseFile(filename, hasAnswers = True):
                 lst[-1] = lst[-1][:-1]  # remove question mark
                 currentPoint.addQuestion(lst[1:], answers)
 
-            # get verbs and nouns
-            for (w, tag) in nltk.pos_tag(lst[1:]):
-                if tag[0] == 'V':
-                    verbs.add(w)
-                elif (tag == 'NN' or tag == 'NNS') and (not w == 'journeyed'):
-                    nouns.add(w)
+            # add words to dictionary
+            for w in lst[1:]:
+                dictionary.add(w)
 
         dataPoints.append(currentPoint)
-        verbs = list(verbs)
-        nouns = list(nouns)
-        verbs.sort()
-        nouns.sort()
-        return dataPoints[1:], verbs, nouns
+        dictionary = list(dictionary)
+        dictionary.sort()
+        return dataPoints[1:], dictionary
