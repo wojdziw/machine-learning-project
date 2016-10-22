@@ -1,16 +1,16 @@
-import DataPoint
+import Story
 
 def parseFile(filename, hasAnswers = True):
     '''
         filename - a name of a file that is formatted as per spec
         hasAnswers - Are there answers to the questions in the file
         returns:
-            dataPoints - a list of DataPoint objects - one for each set of statements
+            stories - a list of Story objects - one for each set of statements
             dictionary - alphabetically sorted list of all the words in the text
     '''
     dictionary = set()
-    dataPoints = []
-    currentPoint = DataPoint.DataPoint()
+    stories = []
+    currentPoint = Story.Story()
     with open(filename, "r") as ins:
         for line in ins:
             # split on whitespace, convert to lowercase
@@ -18,8 +18,8 @@ def parseFile(filename, hasAnswers = True):
 
             # When we see an index of 1, we push the current point and reset it
             if int(lst[0]) == 1:
-                dataPoints.append(currentPoint)
-                currentPoint = DataPoint.DataPoint()
+                stories.append(currentPoint)
+                currentPoint = Story.Story()
 
             # check if the sentence is a statement
             if lst[-1][-1] == '.':
@@ -37,7 +37,7 @@ def parseFile(filename, hasAnswers = True):
             for w in lst[1:]:
                 dictionary.add(w)
 
-        dataPoints.append(currentPoint)
+        stories.append(currentPoint)
         dictionary = list(dictionary)
         dictionary.sort()
-        return dataPoints[1:], dictionary
+        return stories[1:], dictionary
