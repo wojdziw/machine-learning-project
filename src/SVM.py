@@ -44,6 +44,22 @@ def SVMPredict(data, label, model):
 	for prediction in pred:
 		word = dictionary[prediction]
 		print word
+
+
+stories, dictionary = parseFile('train.txt')
+allPoints = np.zeros([1,len(dictonary)])
+allLabels = np.zeros(1)
+
+
+for story in stories:
+	points = stories.constructPoints(dictionary)
+	allPoints.concatenate((points,allPoints), axis = 0)
+	labels = stories.constructLabels(dictionary)
+	allPoints.concatenate((points,allPoints), axis = 0)
+
+
+def SVMPredict(data, label, model):
+	pred = model.predict(data)
 	E = 0.00
 	N = len(pred)
 	for i in range(N):
