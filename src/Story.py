@@ -1,15 +1,25 @@
 from itertools import *
+import numpy as np
+import copy
+
+def uniqueMapping(occurenceIndices):
+    return len(occurenceIndices)
 
 class Story:
     def __init__(self):
         self.wordToNumHash = dict()   # one-based
         self.wordToNumHash['nothing'] = -1 # as per spec
+        self.statementWordIndices = dict()     # Keeps a list of indices of occurences
+                                      # for each word (0-based)
+        self.wordIndicesBeforeQuestion = []     # at index i, the state of statementWordIndices
+                                                # before question i, updated with the
+                                                # indices in the question
         self.wordCount = 0
         self.statementIndices = []    # zero based
         self.questionIndices = []     # zero based
         self.answers = []             # answers[i] is a list of answers to
-                                        # sentences[questionIndices[i]]
-        self.sentences = []             # holds questions and statements
+                                      # sentences[questionIndices[i]]
+        self.sentences = []           # holds questions and statements
 
     def addStatement(self, statement):
         '''
@@ -20,6 +30,9 @@ class Story:
             self.wordCount += 1
             if not word in self.wordToNumHash:
                 self.wordToNumHash[word] = self.wordCount
+                self.statementWordIndices[word] = [self.wordCount - 1] # 0-based
+            else:
+                self.statementWordIndices[word] += [self.wordCount - 1] # 0-based
         self.statementIndices.append(len(self.sentences))
         self.sentences.append(statement)
 
@@ -30,46 +43,96 @@ class Story:
             answers is a (possibly empty) list of single-word answers
             Ex.: ['apple', 'milk']
         '''
+        # copy the current state of statementWordIndices, add the word indices
+        # from the question in the loop below and record it
+        currentWordIndices = copy.deepcopy(self.statementWordIndices)
         for word in question:
             self.wordCount += 1
             if not word in self.wordToNumHash:
                 self.wordToNumHash[word] = self.wordCount
+            if not word in currentWordIndices:
+                currentWordIndices[word] = [self.wordCount - 1] # 0-based
+            else:
+                currentWordIndices[word] += [self.wordCount - 1] # 0-based
+
+
+        self.wordIndicesBeforeQuestion.append(currentWordIndices)
         self.questionIndices.append(len(self.sentences))
         self.sentences.append(question)
         self.answers.append(answers)
 
-    def wordCountsBefore(self, constaints, questionNumber, words):
+
+    def wordCountsBefore(self, questionNumber, words):
         '''
-            Returns a map containing the number of occurences of individual
-            words in *words* in sentences containing all the words in
-            *constaints* before question no. *questionNumber* (0-based)
+            Returns a list containing the number of occurences of individual
+            words in *words* in statemens before question no. *questionNumber* (0-based)
+            and in said question
         '''
         wordCounts = dict(zip(words, repeat(0)))
+        for w in self.sentences[self.questionIndices[questionNumber]]:
+            if w in wordCounts:
+                wordCounts[w] += 1
         for i in self.statementIndices:
             if i > self.questionIndices[questionNumber]:
                 break
             else:
-                if all([(w in self.sentences[i]) for w in constaints]):
-                    for word in self.sentences[i]:
-                        if word in wordCounts:
-                            wordCounts[word] += 1
-        return wordCounts
+                for word in self.sentences[i]:
+                    if word in wordCounts:
+                        wordCounts[word] += 1
+        return [wordCounts[w] for w in words]
 
-    def constructFeatures(self, dictionary):
-        pts = []
-        for i, qi in enumerate(self.questionIndices):
-            name = ""
-            for w in self.sentences[qi]:
-                if nltk.pos_tag([w])[0][1] == 'NNP':
-                    name = w
-                    break
-            point = []
-            for n in nouns:
-                verbCounts = self.wordCountsBefore([name, n], i, verbs)
-                for v, c in verbCounts.items():
-                    point.append((n + ' ' + v, c))
-            pts.append(point)
-        return pts
+    def makeFeatureValuesBefore(self, questionNumber, words):
+        '''
+            Returns a 1xN numpy array containig the values for each word in the
+            dictionary based on the indices of occurence of that word in the
+            statements before question no. *questionNumber* as well as in that
+            question
+        '''
+        featureVector = np.empty(len(words))
+        for i, w in enumerate(words):
+            # Get a list of indices for the word and feed it to the generator function
+            if w in self.wordIndicesBeforeQuestion[questionNumber]:
+                featureVector[i] = uniqueMapping(
+                    self.wordIndicesBeforeQuestion[questionNumber][w])
+            else:
+                featureVector[i] = uniqueMapping([])
+        return featureVector
+
+    def constructPoints(self, dictionary):
+        '''
+            dictionary - python list of words
+            returns:
+                points - NxM np.array, containing the data points, corresponding
+                to the questions in the Story, where N is the number of questions
+                and M is the length of the dictionary
+        '''
+        n = len(self.questionIndices)
+        M = len(dictionary)
+        points = np.empty([n, M])
+        for i in range(n):
+            points[i] = self.wordCountsBefore(i, dictionary)
+        return points
+
+    def constructLabels(self, dictionary):
+        '''
+            dictionary - python list of words
+            returns:
+                labels - 1xN np.array, containing the label for each question
+                where N is the number of questions in this Story
+        '''
+        n = len(self.answers)
+        labels = np.empty(n)
+        for i, ans in enumerate(self.answers):
+            # Map the words in each answer to their index in the dictionary
+            ansNumbers = []
+            for w in ans:
+                if w == 'nothing':
+                    ansNumbers.append(-1)
+                else:
+                    ansNumbers.append(dictionary.index(w))
+            # Make a unique mapping from the indices to an integer
+            labels[i] = uniqueMapping(ansNumbers)
+        return labels
 
 
     def __str__(self):
