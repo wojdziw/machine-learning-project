@@ -1,4 +1,18 @@
+from parser import *
 from sklearn import svm
+
+
+stories, dictionary = parseFile('train.txt')
+allPoints = np.zeros([1,len(dictonary)])
+allLabels = np.zeros(1)
+
+
+for story in stories:
+	points = stories.constructPoints(dictionary)
+	allPoints.concatenate((points,allPoints), axis = 0)
+	labels = stories.constructLabels(dictionary)
+	allPoints.concatenate((points,allPoints), axis = 0)
+
 
 def SVMPredict(data, label, model):
 	pred = model.predict(data)
@@ -27,3 +41,6 @@ def svmTrain(dataTrain, labelTrain, *args):
 	svc = svm.SVC(C, kernel, degree, gamma, coef0)
 	svc.fit(dataTrain, labelTrain)
 	return svc
+
+model = svmTrain(allPoints, allLabels)
+#pred = model.predict(testData)
