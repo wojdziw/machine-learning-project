@@ -1,6 +1,6 @@
 from itertools import *
 
-class DataPoint:
+class Story:
     def __init__(self):
         self.wordToNumHash = dict()   # one-based
         self.wordToNumHash['nothing'] = -1 # as per spec
@@ -55,7 +55,7 @@ class DataPoint:
                             wordCounts[word] += 1
         return wordCounts
 
-    def constructFeatures(self, nouns, verbs):
+    def constructFeatures(self, dictionary):
         pts = []
         for i, qi in enumerate(self.questionIndices):
             name = ""
