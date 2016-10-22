@@ -40,4 +40,7 @@ def parseFile(filename, hasAnswers = True):
         stories.append(currentPoint)
         dictionary = list(dictionary)
         dictionary.sort()
+
+        # adding a dummy element to the ditionary to make it base 1
+        dictionary = ["xxx"] + dictionary
         return stories[1:], dictionary

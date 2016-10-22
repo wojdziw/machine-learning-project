@@ -1,8 +1,16 @@
 from itertools import *
 import numpy as np
 import copy
+import math
 
 def uniqueMapping(indexes):
+
+    if indexes[0] == -1:
+        return -1
+
+    if len(indexes) > 4:
+        return -1
+
     if len(indexes) == 0:
         a = 0
         b = 0
@@ -17,9 +25,14 @@ def uniqueMapping(indexes):
         b = uniqueMapping(indexes[1:])
 
     output = cantorMapping(a,b)
+
     return output
 
 def reverseUniqueMapping(mapping):
+
+    if mapping == -1:
+        return [-1]
+
     a, b = reverseCantorMapping(mapping)
     indexes = [int(a)]
 
@@ -30,6 +43,9 @@ def reverseUniqueMapping(mapping):
         indexes += reverseUniqueMapping(b)
     else:
         indexes.append(int(b))
+
+    if a == 0:
+        return [int(b)]
 
     return indexes
 
@@ -140,7 +156,7 @@ class Story:
                 featureVector[i] = uniqueMapping(
                     self.wordIndicesBeforeQuestion[questionNumber][w])
             else:
-                featureVector[i] = uniqueMapping([])
+                featureVector[i] = uniqueMapping([-1])
         return featureVector
 
     def constructPoints(self, dictionary):
@@ -155,7 +171,7 @@ class Story:
         M = len(dictionary)
         points = np.empty([n, M])
         for i in range(n):
-            points[i] = self.wordCountsBefore(i, dictionary)
+            points[i] = self.makeFeatureValuesBefore(i, dictionary)
         return points
 
     def constructLabels(self, dictionary):
@@ -176,9 +192,12 @@ class Story:
                 else:
                     ansNumbers.append(dictionary.index(w))
             # Make a unique mapping from the indices to an integer
-            # uniqueMapping not active yet because we're scared of the big noise
-            # labels[i] = uniqueMapping(ansNumbers)
-            labels[i] = ansNumbers[0]
+
+            # print ansNumbers
+            # print uniqueMapping(ansNumbers)
+            # print reverseUniqueMapping(uniqueMapping(ansNumbers))
+            labels[i] = uniqueMapping(ansNumbers)
+
         return labels
 
 

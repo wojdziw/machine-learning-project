@@ -1,14 +1,15 @@
 from parser import *
+from Story import *
 from sklearn import svm
 import numpy as np
 
-print "1"
+print ("1")
 
 stories, dictionary = parseFile('train.txt')
 allPoints = np.zeros([1,len(dictionary)])
 allLabels = np.zeros(1)
 
-print "2"
+print ("2")
 
 for story in stories:
 	points = story.constructPoints(dictionary)
@@ -19,7 +20,7 @@ for story in stories:
 allPoints = allPoints[1:]
 allLabels = allLabels[1:]
 
-print "3"
+print ("3")
 
 testStories, testDictionary = parseFile('train.txt')
 testData = np.zeros([1,len(dictionary)])
@@ -28,7 +29,7 @@ testLabels = np.zeros(1)
 testData = testData[1:]
 testLabels = testLabels[1:]
 
-print "4"
+print ("4")
 
 for story in testStories:
 	points = story.constructPoints(dictionary)
@@ -36,7 +37,7 @@ for story in testStories:
 	labels = story.constructLabels(dictionary)
 	testLabels = np.concatenate((testLabels, labels), axis = 0)
 
-print "5"
+print ("5")
 
 # HERE RETURN THE THINGS IN THE REQUIRED KAGGLE FORMAT
 def SVMPredict(data, label, model):
@@ -49,7 +50,7 @@ def SVMPredict(data, label, model):
 	return (1-1.00/N*E)
 	return 0
 
-print "6"
+print ("6")
 
 
 def svmTrain(dataTrain, labelTrain, *args):
@@ -67,23 +68,25 @@ def svmTrain(dataTrain, labelTrain, *args):
 		coef0 = args[4]
 
 	# Uncomment if regression
-	# svc = svm.SVR(C, epsilon=0.2)
+	# svc = svm.SVR(C, kernel, degree, gamma, coef0)
 	svc = svm.SVC(C, kernel, degree, gamma, coef0)
 	svc.fit(dataTrain, labelTrain)
 	return svc
 
-print "7"
+print ("7")
 
 model = svmTrain(allPoints, allLabels)
 
-print "8"
+print ("8")
 
 pred = model.predict(testData)
 
 for prediction in pred:
-		if prediction == -1:
-			word = "nothing"
-		else:
-			word = dictionary[int(prediction)]
-		print word
-		print prediction
+		wordIndexes = reverseUniqueMapping(int(prediction))
+		for wordIndex in wordIndexes:
+			if wordIndex == -1:
+				print ("nothing")
+			else:
+				print (dictionary[wordIndex])
+
+		print ("---")
