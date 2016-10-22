@@ -1,5 +1,4 @@
 from itertools import *
-import nltk
 
 class DataPoint:
     def __init__(self):
