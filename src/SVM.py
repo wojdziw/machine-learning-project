@@ -41,25 +41,6 @@ print "5"
 # HERE RETURN THE THINGS IN THE REQUIRED KAGGLE FORMAT
 def SVMPredict(data, label, model):
 	pred = model.predict(data)
-	for prediction in pred:
-		word = dictionary[prediction]
-		print word
-
-
-stories, dictionary = parseFile('train.txt')
-allPoints = np.zeros([1,len(dictonary)])
-allLabels = np.zeros(1)
-
-
-for story in stories:
-	points = stories.constructPoints(dictionary)
-	allPoints.concatenate((points,allPoints), axis = 0)
-	labels = stories.constructLabels(dictionary)
-	allPoints.concatenate((points,allPoints), axis = 0)
-
-
-def SVMPredict(data, label, model):
-	pred = model.predict(data)
 	E = 0.00
 	N = len(pred)
 	for i in range(N):
@@ -85,6 +66,8 @@ def svmTrain(dataTrain, labelTrain, *args):
 		gamma = args[3]
 		coef0 = args[4]
 
+	# Uncomment if regression
+	# svc = svm.SVR(C, epsilon=0.2)
 	svc = svm.SVC(C, kernel, degree, gamma, coef0)
 	svc.fit(dataTrain, labelTrain)
 	return svc
@@ -96,9 +79,11 @@ model = svmTrain(allPoints, allLabels)
 print "8"
 
 pred = model.predict(testData)
+
 for prediction in pred:
 		if prediction == -1:
 			word = "nothing"
 		else:
 			word = dictionary[int(prediction)]
 		print word
+		print prediction
