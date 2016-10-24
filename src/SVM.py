@@ -9,6 +9,8 @@ stories, dictionary = parseFile('train.txt')
 allPoints = np.zeros([1,len(dictionary)])
 allLabels = np.zeros(1)
 
+
+
 print ("2")
 
 for story in stories:
@@ -39,7 +41,31 @@ for story in testStories:
 
 print ("5")
 
-# HERE RETURN THE THINGS IN THE REQUIRED KAGGLE FORMAT
+def translator(pred):
+	wordIndices = []
+	for prediction in pred:
+		wordIndices += reverseUniqueMapping(int(prediction))
+	mainString = ''
+	counter = 0
+	for i in range(len(stories)):
+		print (stories[i].wordToNumHash)
+		for j in range(len(stories[i].questionIndices)):
+			string = str(i) + '_' + str(j) + ','
+			answerNum = wordIndices[counter]
+			answerWord = dictionary[answerNum]
+			if answerNum == -1:
+				answerWord = 'nothing'
+			print(answerWord)
+			if answerWord not in stories[i].wordToNumHash.keys():
+				string += '0' + '\n'
+			else:
+				string += str(stories[i].wordToNumHash[answerWord]) + '\n'
+			counter += 1
+			mainString += string
+	f = open('Answers.txt', 'w')
+	f.write(mainString)
+	f.close()
+
 def SVMPredict(data, label, model):
 	pred = model.predict(data)
 	E = 0.00
@@ -81,6 +107,12 @@ print ("8")
 
 pred = model.predict(testData)
 
+print ("9")
+
+translator(pred)
+
+
+'''
 for prediction in pred:
 		wordIndexes = reverseUniqueMapping(int(prediction))
 		for wordIndex in wordIndexes:
@@ -90,3 +122,5 @@ for prediction in pred:
 				print (dictionary[wordIndex])
 
 		print ("---")
+
+'''
