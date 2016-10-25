@@ -9,7 +9,7 @@ def uniqueMapping(indexes):
         return -1
 
     if len(indexes) > 4:
-        return -1
+        return 1234
 
     if len(indexes) == 0:
         a = 0

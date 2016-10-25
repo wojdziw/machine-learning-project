@@ -3,44 +3,6 @@ from Story import *
 from sklearn import svm
 import numpy as np
 
-print ("1")
-
-stories, dictionary = parseFile('train.txt')
-allPoints = np.zeros([1,len(dictionary)])
-allLabels = np.zeros(1)
-
-
-
-print ("2")
-
-for story in stories:
-	points = story.constructPoints(dictionary)
-	allPoints = np.concatenate((allPoints, points), axis = 0)
-	labels = story.constructLabels(dictionary)
-	allLabels = np.concatenate((allLabels, labels), axis = 0)
-
-allPoints = allPoints[1:]
-allLabels = allLabels[1:]
-
-print ("3")
-
-testStories, testDictionary = parseFile('train.txt')
-testData = np.zeros([1,len(dictionary)])
-testLabels = np.zeros(1)
-
-testData = testData[1:]
-testLabels = testLabels[1:]
-
-print ("4")
-
-for story in testStories:
-	points = story.constructPoints(dictionary)
-	testData = np.concatenate((testData, points), axis = 0)
-	labels = story.constructLabels(dictionary)
-	testLabels = np.concatenate((testLabels, labels), axis = 0)
-
-print ("5")
-
 def translator(pred):
 	wordIndices = []
 	for prediction in pred:
@@ -62,7 +24,7 @@ def translator(pred):
 				string += str(stories[i].wordToNumHash[answerWord]) + '\n'
 			counter += 1
 			mainString += string
-	f = open('Answers.txt', 'w')
+	f = open('Answers.csv', 'w')
 	f.write(mainString)
 	f.close()
 
@@ -75,9 +37,6 @@ def SVMPredict(data, label, model):
 		E += k
 	return (1-1.00/N*E)
 	return 0
-
-print ("6")
-
 
 def svmTrain(dataTrain, labelTrain, *args):
 	C = 1.0
@@ -98,29 +57,3 @@ def svmTrain(dataTrain, labelTrain, *args):
 	svc = svm.SVC(C, kernel, degree, gamma, coef0)
 	svc.fit(dataTrain, labelTrain)
 	return svc
-
-print ("7")
-
-model = svmTrain(allPoints, allLabels)
-
-print ("8")
-
-pred = model.predict(testData)
-
-print ("9")
-
-translator(pred)
-
-
-'''
-for prediction in pred:
-		wordIndexes = reverseUniqueMapping(int(prediction))
-		for wordIndex in wordIndexes:
-			if wordIndex == -1:
-				print ("nothing")
-			else:
-				print (dictionary[wordIndex])
-
-		print ("---")
-
-'''
