@@ -7,23 +7,23 @@ from SVM import *
 print ("1")
 
 stories, dictionary = parseFile('train.txt')
-allPoints = np.zeros([1,len(dictionary)])
-allLabels = np.zeros(1)
+trainData = np.zeros([1,len(dictionary)])
+trainLabels = np.zeros(1)
 
 print ("2")
 
 for story in stories:
 	points = story.constructPoints(dictionary)
-	allPoints = np.concatenate((allPoints, points), axis = 0)
+	trainData = np.concatenate((trainData, points), axis = 0)
 	labels = story.constructLabels(dictionary)
-	allLabels = np.concatenate((allLabels, labels), axis = 0)
+	trainLabels = np.concatenate((trainLabels, labels), axis = 0)
 
-allPoints = allPoints[1:]
-allLabels = allLabels[1:]
+trainData = trainData[1:]
+trainLabels = trainLabels[1:]
 
 print ("3")
 
-testStories, testDictionary = parseFile('test.txt')
+testStories, testDictionary = parseFile('test.txt', hasAnswers=False)
 testData = np.zeros([1,len(dictionary)])
 
 testData = testData[1:]
@@ -36,17 +36,25 @@ for story in testStories:
 
 print ("5")
 
-# model = svmTrain(allPoints, allLabels)
+# model = svmTrain(trainData, trainLabels)
 
-# print ("8")
+# print ("6")
 
-# pred = model.predict(allPoints)
+# pred = model.predict(testData)
 
-# print ("9")
+# print ("7")
 
-# # translator(pred)
+# # # translator(pred)
 
 # print ("10")
+
+# for prediction in pred:
+# 	if int(prediction) == -1:
+# 		print "nothing"
+# 	else:
+# 		print dictionary[int(prediction)]
+
+# translator(pred, stories, dictionary)
 
 # for prediction in pred:
 # 		wordIndexes = reverseUniqueMapping(int(prediction))

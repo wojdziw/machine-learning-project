@@ -5,15 +5,14 @@ import math
 
 def uniqueMapping(indexes):
 
-    if indexes[0] == -1:
-        return -1
-
     if len(indexes) > 4:
-        return 1234
+        indexes = indexes[0:4]
 
     if len(indexes) == 0:
         a = 0
         b = 0
+    elif indexes[0] == -1:
+        return -1
     elif len(indexes) == 1:
         a = indexes[0]
         b = 0
@@ -197,6 +196,7 @@ class Story:
             # print uniqueMapping(ansNumbers)
             # print reverseUniqueMapping(uniqueMapping(ansNumbers))
             labels[i] = uniqueMapping(ansNumbers)
+            labels[i] = ansNumbers[0]
 
         return labels
 
