@@ -65,6 +65,12 @@ def reverseCantorMapping(mapping):
 
     return returnList
 
+def labelPlusTenProduct(numbers):
+    product = 1
+    for number in numbers:
+        product *= number+10
+    return product
+
 class Story:
     def __init__(self):
         self.wordToNumHash = dict()   # one-based
@@ -191,12 +197,13 @@ class Story:
                 else:
                     ansNumbers.append(dictionary.index(w))
             # Make a unique mapping from the indices to an integer
-
-            # print ansNumbers
-            # print uniqueMapping(ansNumbers)
-            # print reverseUniqueMapping(uniqueMapping(ansNumbers))
-            labels[i] = uniqueMapping(ansNumbers)
-            labels[i] = ansNumbers[0]
+            # labels[i] = uniqueMapping(ansNumbers)
+            # labels[i] = labelPlusTenProduct(ansNumbers)
+            ansNumbers[:] = [x+10 for x in ansNumbers]
+            if len(ansNumbers) > 1:
+                labels[i] = uniqueMapping(ansNumbers)
+            else:
+                labels[i] = ansNumbers[0]
 
         return labels
 

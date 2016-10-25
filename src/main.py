@@ -3,16 +3,16 @@ from Story import *
 from sklearn import svm
 import numpy as np
 from sklearn import svm
-
+from sklearn.neural_network import MLPClassifier
 from SVM import *
 
-print ("1")
+print ("Parsing the train data")
 
 stories, dictionary = parseFile('train.txt')
 trainData = np.zeros([1,len(dictionary)])
 trainLabels = np.zeros(1)
 
-print ("2")
+print ("Producing the train data points and labels")
 
 for story in stories:
 	points = story.constructPoints(dictionary)
@@ -23,44 +23,67 @@ for story in stories:
 trainData = trainData[1:]
 trainLabels = trainLabels[1:]
 
-print ("3")
+print ("Parsing the test data")
 
 testStories, testDictionary = parseFile('test.txt', hasAnswers=False)
 testData = np.zeros([1,len(dictionary)])
 
 testData = testData[1:]
 
-print ("4")
+print ("Producing the test data points and labels")
 
 for story in testStories:
 	points = story.constructPoints(dictionary)
 	testData = np.concatenate((testData, points), axis = 0)
 
-print ("5")
+print ("Initialising the SVMs")
 
-model = svmTrain(trainData, trainLabels)
-# model = svm.SVR(C=1.0, epsilon=0.2)
+# SVMs
+modelR = svm.SVR(C=1.0, epsilon=0.2)
+modelC = svm.SVC()
 
-print ("6")
+# print ("Fitting the regression SVM")
+print ("Fitting the classification SVM")
+modelC.fit(trainData, trainLabels)
 
-pred = model.predict(testData)
+print ("Predicting the labels")
+predC = modelC.predict(testData)
 
-print ("7")
+# print "SVM Binary accuracy is:" + str(binaryAccuracy(predC,trainLabels))
 
-for prediction in pred:
+# Neural net
+'''
+net = MLPClassifier(solver='lbfgs', alpha=1e-5,hidden_layer_sizes=(5, 2), random_state=1)
+net.fit(trainData, trainLabels)
+predNet = net.predict(trainData)
+predProb = net.predict_proba(trainData)
+print "Neural Net Binary accuracy is:" + str(binaryAccuracy(predNet,trainLabels))
+'''
+
+# Random forest
+'''
+rf = RandomForestClassifier(n_estimators=10)
+rf.fit(trainData, trainLabels)
+predRf = rf.predict(trainData)
+print "Neural Net Binary accuracy is:" + str(binaryAccuracy(predRf,trainLabels))
+'''
+
+'''
+print ("Printing the results")
+for prediction in predC:
+	prediction -= 10
 	if int(prediction) == -1:
 		print "nothing"
+	elif int(prediction) > 32:
+		inds = reverseUniqueMapping(prediction+10)
+		words = ''
+		for ind in inds:
+			words = words + dictionary[ind-10] + ', '
+		print words
 	else:
 		print dictionary[int(prediction)]
+'''
 
-translator(pred, testStories, dictionary)
 
-# for prediction in pred:
-# 		wordIndexes = reverseUniqueMapping(int(prediction))
-# 		for wordIndex in wordIndexes:
-# 			if wordIndex == -1:
-# 				print ("nothing")
-# 			else:
-# 				print (dictionary[wordIndex])
-# 		print ("---")
-
+print ("Saving this into a csv")
+translator(predC, testStories, dictionary)
