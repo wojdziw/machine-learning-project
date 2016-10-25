@@ -2,6 +2,8 @@ from parser import *
 from Story import *
 from sklearn import svm
 import numpy as np
+from sklearn import svm
+
 from SVM import *
 
 print ("1")
@@ -36,25 +38,22 @@ for story in testStories:
 
 print ("5")
 
-# model = svmTrain(trainData, trainLabels)
+model = svmTrain(trainData, trainLabels)
+# model = svm.SVR(C=1.0, epsilon=0.2)
 
-# print ("6")
+print ("6")
 
-# pred = model.predict(testData)
+pred = model.predict(testData)
 
-# print ("7")
+print ("7")
 
-# # # translator(pred)
+for prediction in pred:
+	if int(prediction) == -1:
+		print "nothing"
+	else:
+		print dictionary[int(prediction)]
 
-# print ("10")
-
-# for prediction in pred:
-# 	if int(prediction) == -1:
-# 		print "nothing"
-# 	else:
-# 		print dictionary[int(prediction)]
-
-# translator(pred, stories, dictionary)
+translator(pred, testStories, dictionary)
 
 # for prediction in pred:
 # 		wordIndexes = reverseUniqueMapping(int(prediction))
