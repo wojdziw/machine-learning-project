@@ -1,0 +1,15 @@
+1 John grabbed the apple.
+2 Mary travelled to the hallway.
+3 What is John holding?	apple
+4 John grabbed the milk.
+5 John put down the milk.
+6 What is John holding?	apple
+7 John got the milk.
+8 Daniel went to the garden.
+9 What is John holding?	apple,milk
+10 Sandra grabbed the football.
+11 Sandra gave Daniel the football.
+12 What is Sandra holding?	nothing
+13 Mary moved to the garden.
+14 Mary journeyed to the hallway.
+15 What is Sandra holding?	nothing

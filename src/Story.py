@@ -43,8 +43,8 @@ def reverseUniqueMapping(mapping):
     else:
         indexes.append(int(b))
 
-    if a == 0:
-        return [int(b)]
+    # if a == 0:
+    #     return [int(b)]
 
     return indexes
 
@@ -198,6 +198,23 @@ class Story:
 
         return labels
 
+    def constructBinaryLabels(self, dictionary):
+        '''
+            dictionary - python list of words
+            returns:
+                labels - Nxd np.array, containing 1 if the word is in the
+                answer and 0 otherwise
+        '''
+        n = len(self.answers)
+        d = len(dictionary)
+        labels = np.empty([n, d])
+        for i, ans in enumerate(self.answers):
+            line = np.zeros(d)
+            for w in ans:
+                if w in dictionary:
+                    line[dictionary.index(w)] += 1
+            labels[i] = line
+        return labels
 
     def __str__(self):
         ret = ""

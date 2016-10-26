@@ -42,5 +42,5 @@ def parseFile(filename, hasAnswers = True):
         dictionary.sort()
 
         # adding a dummy element to the ditionary to make it base 1
-        dictionary = ["xxx"] + dictionary
+        dictionary = ["nothing"] + dictionary
         return stories[1:], dictionary
