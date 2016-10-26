@@ -5,8 +5,8 @@ import math
 
 def uniqueMapping(indexes):
 
-    if len(indexes) > 4:
-        indexes = indexes[0:4]
+    if len(indexes) > 5:
+        indexes = indexes[0:5]
 
     if len(indexes) == 0:
         a = 0
@@ -64,12 +64,6 @@ def reverseCantorMapping(mapping):
     returnList.sort()
 
     return returnList
-
-def labelPlusTenProduct(numbers):
-    product = 1
-    for number in numbers:
-        product *= number+10
-    return product
 
 class Story:
     def __init__(self):
@@ -198,7 +192,6 @@ class Story:
                     ansNumbers.append(dictionary.index(w))
             # Make a unique mapping from the indices to an integer
             # labels[i] = uniqueMapping(ansNumbers)
-            # labels[i] = labelPlusTenProduct(ansNumbers)
             ansNumbers[:] = [x+10 for x in ansNumbers]
             if len(ansNumbers) > 1:
                 labels[i] = uniqueMapping(ansNumbers)

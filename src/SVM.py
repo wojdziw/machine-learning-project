@@ -4,39 +4,6 @@ from sklearn import svm
 import numpy as np
 from sklearn.metrics import f1_score
 
-# def translator(pred, stories, dictionary):
-# 	wordIndices = []
-# 	for prediction in pred:
-# 		prediction -= 10
-# 		if int(prediction) > 32:
-# 			multWords = reverseUniqueMapping(prediction+10)
-# 			multWords[:] = [x-10 for x in multWords]
-# 			wordIndices += multWords
-# 			# wordIndices += [32]
-# 		else:
-# 			wordIndices += [int(prediction)]
-# 	mainString = ''
-# 	counter = 0
-# 	for i in range(len(stories)):
-# 		print (stories[i].wordToNumHash)
-# 		for j in range(len(stories[i].questionIndices)):
-# 			string = str(i+1) + '_' + str(j+1) + ','
-
-# 			answerNum = wordIndices[counter]
-# 			answerWord = dictionary[answerNum]
-# 			if answerNum == -1:
-# 				answerWord = 'nothing'
-# 			print(answerWord)
-# 			if answerWord not in stories[i].wordToNumHash.keys():
-# 				string += '0' + '\n'
-# 			else:
-# 				string += str(stories[i].wordToNumHash[answerWord]) + '\n'
-# 			counter += 1
-# 			mainString += string
-# 	f = open('Answers.csv', 'w')
-# 	f.write(mainString)
-# 	f.close()
-
 def translator(pred, stories, dictionary):
 	wordIndices = []
 	for prediction in pred:
@@ -63,6 +30,10 @@ def translator(pred, stories, dictionary):
 				currentStoryWordIndices.sort()
 				for currentStoryWordIndex in currentStoryWordIndices:
 					string += str(currentStoryWordIndex) + ' '
+
+			if string[len(string)-1] == " ":
+				string = string[0:len(string)-1]
+
 			string += '\n'
 			counter += 1
 			mainString += string

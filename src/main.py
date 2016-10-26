@@ -39,7 +39,6 @@ for story in testStories:
 print ("Initialising the SVMs")
 
 # SVMs
-modelR = svm.SVR(C=1.0, epsilon=0.2)
 modelC = svm.SVC()
 
 # print ("Fitting the regression SVM")
@@ -85,5 +84,5 @@ for prediction in predC:
 '''
 
 
-print ("Saving this into a csv")
+# print ("Saving this into a csv")
 translator(predC, testStories, dictionary)
