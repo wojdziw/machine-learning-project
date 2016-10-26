@@ -190,9 +190,7 @@ class Story:
                     ansNumbers.append(-1)
                 else:
                     ansNumbers.append(dictionary.index(w))
-            # Make a unique mapping from the indices to an integer
-            # labels[i] = uniqueMapping(ansNumbers)
-            ansNumbers[:] = [x+10 for x in ansNumbers]
+
             if len(ansNumbers) > 1:
                 labels[i] = uniqueMapping(ansNumbers)
             else:

@@ -7,10 +7,8 @@ from sklearn.metrics import f1_score
 def translator(pred, stories, dictionary):
 	wordIndices = []
 	for prediction in pred:
-		prediction -= 10
 		if int(prediction) > 32:
-			multWords = reverseUniqueMapping(prediction+10)
-			multWords[:] = [x-10 for x in multWords]
+			multWords = reverseUniqueMapping(prediction)
 			wordIndices.append(multWords)
 		else:
 			wordIndices.append([int(prediction)])
