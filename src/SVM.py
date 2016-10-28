@@ -74,41 +74,6 @@ def binaryAccuracy(labels, predictions):
 			correct += 1
 	return correct/len(labels)
 
-def mltBinaryAccuracy(labels, predictions):
-	'''
-		Gives us overall acc as well as acc on different types of quesitons.
-		labels[0] and predictions[0] correspond to 'nothing'
-	'''
-	correct = 0.0
-	nothings = 0.0
-	nothings_c = 0.0
-	multilabel = 0.0
-	multilabel_c = 0.0
-	singlelabel = 0.0
-	singlelabel_c = 0.0
-	for i in range(labels.shape[0]):
-
-		isCorrect =  np.all(labels[i] == predictions[i])
-		if isCorrect:
-			correct += 1
-		if labels[i][0] > 0:
-			nothings += 1
-			if isCorrect:
-				nothings_c += 1
-		elif np.sum(labels[i]) > 1.5:
-			multilabel += 1
-			if isCorrect:
-				multilabel_c += 1
-		else: # single
-			singlelabel += 1
-			if isCorrect:
-				singlelabel_c += 1
-	nothing_acc = nothings_c / nothings
-	multilabel_acc = multilabel_c / multilabel
-	singlelabel_acc = singlelabel_c / singlelabel
-	if nothings + multilabel + singlelabel != labels.shape[0]:
-		print("WTFFFF: ", str(labels.shape[0] - nothings - multilabel - singlelabel))
-	return correct / len(labels), nothing_acc, multilabel_acc, singlelabel_acc
 
 def f1Accuracy(labels, predictions):
 	return f1_score(labels, predictions, average='macro')

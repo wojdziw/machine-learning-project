@@ -1,4 +1,6 @@
 import Story
+from constants import *
+import numpy as np
 
 def parseFile(filename, hasAnswers = True):
     '''
@@ -44,3 +46,61 @@ def parseFile(filename, hasAnswers = True):
         # adding a dummy element to the ditionary to make it base 1
         dictionary = ["nothing"] + dictionary
         return stories[1:], dictionary
+
+def parseAll():
+    print ("Parsing the train data...")
+
+    stories, dictionary = parseFile(KAGGLE_TRAIN_TXT_FILE)
+    trainData_um = np.zeros([1,len(dictionary)]) # with uniqueMapping
+    trainData_bow = np.zeros([1,len(dictionary)]) # as bag-of-words
+    trainLabels = np.zeros([1, len(dictionary)])
+
+    print ("Producing the train data points and labels...")
+
+    # Make points and labels for each
+    for story in stories:
+        points_um = story.constructPoints(dictionary, bagOfWords=False)
+        points_bow = story.constructPoints(dictionary, bagOfWords=True)
+        trainData_um = np.concatenate((trainData_um, points_um), axis = 0)
+        trainData_bow = np.concatenate((trainData_bow, points_bow), axis = 0)
+        labels = story.constructBinaryLabels(dictionary)
+        trainLabels = np.concatenate((trainLabels, labels), axis = 0)
+
+    trainData_um = trainData_um[1:]
+    trainData_bow = trainData_bow[1:]
+    trainLabels = trainLabels[1:]
+
+    print ("Parsing the test data...")
+
+    testStories, _ = parseFile(KAGGLE_TEST_TXT_FILE, hasAnswers=False)
+    testData_um = np.zeros([1,len(dictionary)])
+    testData_bow = np.zeros([1,len(dictionary)])
+    testLabels = np.zeros([1, len(dictionary)])
+
+    print ("Producing the test data points and labels...")
+
+    for story in testStories:
+        points_um = story.constructPoints(dictionary, bagOfWords=False)
+        points_bow = story.constructPoints(dictionary, bagOfWords=True)
+        testData_um = np.concatenate((testData_um, points_um), axis = 0)
+        testData_bow = np.concatenate((testData_bow, points_bow), axis = 0)
+        labels = story.constructBinaryLabels(dictionary)
+        testLabels = np.concatenate((testLabels, labels), axis = 0)
+
+    testData_um = testData_um[1:]
+    testData_bow = testData_bow[1:]
+    testLabels = testLabels[1:]
+
+
+    # Save everything to files
+    print("Saving parsed data to .npy files")
+    np.save(DICTIONARY_FILE, dictionary)
+
+    np.save(TRAIN_DATA_UM_FILE, trainData_um)
+    np.save(TRAIN_DATA_BOW_FILE, trainData_bow)
+    np.save(TRAIN_LABELS_FILE, trainLabels)
+    np.save(TRAIN_STORIES_FILE, np.array(stories))
+
+    np.save(TEST_DATA_UM_FILE, testData_um)
+    np.save(TEST_DATA_BOW_FILE, testData_bow)
+    np.save(TEST_STORIES_FILE, np.array(testStories))

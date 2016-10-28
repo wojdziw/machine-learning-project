@@ -2,68 +2,7 @@ from itertools import *
 import numpy as np
 import copy
 import math
-
-def uniqueMapping(indexes):
-
-    if len(indexes) > 5:
-        indexes = indexes[0:5]
-
-    if len(indexes) == 0:
-        a = 0
-        b = 0
-    elif indexes[0] == -1:
-        return -1
-    elif len(indexes) == 1:
-        a = indexes[0]
-        b = 0
-    elif len(indexes) == 2:
-        a = indexes[0]
-        b = indexes[1]
-    else:
-        a = indexes[0]
-        b = uniqueMapping(indexes[1:])
-
-    output = cantorMapping(a,b)
-
-    return output
-
-def reverseUniqueMapping(mapping):
-
-    if mapping == -1:
-        return [-1]
-
-    a, b = reverseCantorMapping(mapping)
-    indexes = [int(a)]
-
-    # threshold - basically the number of elements in the array
-    threshold = 32
-
-    if b > threshold:
-        indexes += reverseUniqueMapping(b)
-    else:
-        indexes.append(int(b))
-
-    # if a == 0:
-    #     return [int(b)]
-
-    return indexes
-
-def cantorMapping(a,b):
-    output = (a+b)*(a+b+1)/2+b
-
-    return output
-
-def reverseCantorMapping(mapping):
-    w = math.floor((math.sqrt(8*mapping+1)-1)/2)
-    t = w*(w+1)/2
-
-    b = mapping-t
-    a = w-b
-
-    returnList = [a,b]
-    returnList.sort()
-
-    return returnList
+from utils import *
 
 class Story:
     def __init__(self):
@@ -158,7 +97,26 @@ class Story:
                 featureVector[i] = uniqueMapping([-1])
         return featureVector
 
-    def constructPoints(self, dictionary):
+
+    def constructBagOfWordsFeaturesBefore(self, questionNumber, words):
+        '''
+            Returns a 1xN numpy array containig the values for each word in the
+            dictionary based on the indices of occurence of that word in the
+            statements before question no. *questionNumber* as well as in that
+            question
+        '''
+        featureVector = np.empty(len(words))
+        for i, w in enumerate(words):
+            # Get a list of indices for the word and feed it to the generator function
+            if w in self.wordIndicesBeforeQuestion[questionNumber]:
+                featureVector[i] = len(
+                    self.wordIndicesBeforeQuestion[questionNumber][w])
+            else:
+                featureVector[i] = 0
+        return featureVector
+
+
+    def constructPoints(self, dictionary, bagOfWords=False):
         '''
             dictionary - python list of words
             returns:
@@ -170,8 +128,12 @@ class Story:
         M = len(dictionary)
         points = np.empty([n, M])
         for i in range(n):
-            points[i] = self.makeFeatureValuesBefore(i, dictionary)
+            if bagOfWords:
+                points[i] = self.constructBagOfWordsFeaturesBefore(i, dictionary)
+            else:
+                points[i] = self.makeFeatureValuesBefore(i, dictionary)
         return points
+
 
     def constructLabels(self, dictionary):
         '''
@@ -215,6 +177,8 @@ class Story:
                     line[dictionary.index(w)] += 1
             labels[i] = line
         return labels
+
+
 
     def __str__(self):
         ret = ""
