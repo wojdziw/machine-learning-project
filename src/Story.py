@@ -116,7 +116,7 @@ class Story:
         return featureVector
 
     def constructBigramFeaturesBefore(self, questionNumber, bigrams):
-        bigramCounts = dict(zip(bigrams, repeat(0)))
+        bigramCounts = dict(zip([tuple(b) for b in bigrams.tolist()], repeat(0)))
         featureVector = np.empty(len(bigrams), dtype='uint8')
         for si in self.statementIndices:
             if si < self.questionIndices[questionNumber]: # look only at statements before question *questionNumber*
@@ -190,7 +190,7 @@ class Story:
 
 
     def constructBigramOrderFeaturesBefore(self, questionNumber, bigrams):
-        bigramIndices = dict(zip(bigrams, repeat([])))
+        bigramIndices = dict(zip([tuple(b) for b in bigrams.tolist()], repeat([])))
         featureVector = np.empty(len(bigrams), dtype='uint8')
         for si in self.statementIndices:
             if si < self.questionIndices[questionNumber]: # look only at statements before question *questionNumber*
@@ -211,7 +211,7 @@ class Story:
                 warnings.warn("Bigram not in bigram dictionary: " + str(qb))
 
         for i, b in enumerate(bigrams):
-            featureVector[i] = uniqueMapping(bigramIndices[b])
+            featureVector[i] = uniqueMapping(bigramIndices[tuple(b)])
         return featureVector
 
 
@@ -220,7 +220,7 @@ class Story:
         M = len(bigrams)
         points = np.empty([n, M], dtype='uint8')
         for i in range(n):
-            points[i] = self.constructBigramFeaturesBefore(i, bigrams)
+            points[i] = self.constructBigramOrderFeaturesBefore(i, bigrams)
         return points
 
 

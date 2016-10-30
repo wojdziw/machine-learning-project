@@ -23,9 +23,8 @@ TRAIN_DATA_BOW_FILE = '../data/train_bow.npy'
 TRAIN_DATA_BGR_FILE = '../data/train_bgr.npy'
 TRAIN_DATA_BGR_FOUND_FILE = '../data/train_bgr_found.npy'
 TRAIN_DATA_TRGR_FOUND_FILE = '../data/train_trgr_found.npy'
-TRAIN_DATA_BGR_ORDER_FILE = '../data/train_bgr.npy'
+TRAIN_DATA_BGR_ORDER_FILE = '../data/train_bgr_order.npy'
 TRAIN_STORIES_FILE = '../data/train_stories.npy'
-
 TRAIN_LABELS_FILE = '../data/train_labels.npy'
 TRAIN_LABELS_ANS_FILE = '../data/train_labels_ans.npy'
 
@@ -35,6 +34,7 @@ TEST_DATA_BGR_FILE = '../data/test_bgr.npy'
 TEST_DATA_BGR_FOUND_FILE = '../data/test_bgr_found.npy'
 TEST_DATA_TRGR_FOUND_FILE = '../data/test_trgr_found.npy'
 TEST_DATA_BGR_ORDER_FILE = '../data/test_bgr.npy'
+TEST_DATA_BGR_ORDER_FILE = '../data/test_bgr_order.npy'
 TEST_STORIES_FILE = '../data/test_stories.npy'
 
 ANSWERS_CSV_FILE = '../out/Answers_' + timestamp_str + '.csv'

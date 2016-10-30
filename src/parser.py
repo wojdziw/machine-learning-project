@@ -84,8 +84,8 @@ def parseAll():
     trainLabels = np.zeros([1, len(dictionary)])
     trainLabelsAns = np.zeros([1, len(ansLabels)])
 
-    print ("Producing the train data points and labels...")
 
+    print ("Producing the train data points and labels...")
     # Make points and labels for each
     for story in stories:
         points_um = story.constructPoints(dictionary[1:], bagOfWords=False)
@@ -126,8 +126,6 @@ def parseAll():
     testData_trgrF = np.zeros([1,len(trigramsFound)])
     testData_bgr_order = np.zeros([1,len(bigrams)])
 
-    testLabels = np.zeros([1, len(dictionary)])
-
     print ("Producing the test data points and labels...")
 
     for story in testStories:
@@ -145,18 +143,12 @@ def parseAll():
         testData_trgrF = np.concatenate((testData_trgrF, points_trgrF), axis = 0)
         testData_bgr_order = np.concatenate((testData_bgr_order, points_bgr_order), axis=0)
 
-        labels = story.constructBinaryLabels(dictionary)
-        testLabels = np.concatenate((testLabels, labels), axis = 0)
-
     testData_um = testData_um[1:]
     testData_bow = testData_bow[1:]
     testData_bgr = testData_bgr[1:]
     testData_bgrF = testData_bgrF[1:]
     testData_trgrF = testData_trgrF[1:]
     testData_bgr_order = testData_bgr_order[1:]
-
-    testLabels = testLabels[1:]
-
 
     # Save everything to files
     print("Saving parsed data to .npy files")
