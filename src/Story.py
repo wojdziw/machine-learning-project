@@ -150,6 +150,52 @@ class Story:
         return points
 
 
+
+
+
+
+
+    def constructBigramOrderFeaturesBefore(self, questionNumber, bigrams):
+        bigramIndices = dict(zip(bigrams, repeat([])))
+        featureVector = np.empty(len(bigrams), dtype='uint8')
+        for si in self.statementIndices:
+            if si < self.questionIndices[questionNumber]: # look only at statements before question *questionNumber*
+                statementBigrams = generateBigramsFromSent(self.sentences[si])
+                for i, sb in enumerate(statementBigrams):
+                    if sb in bigramIndices:
+                        bigramIndices[sb].append(i)
+                    else:
+                        warnings.warn("Bigram not in bigram dictionary: " + str(sb))
+            else: # exit the loop if we reached the question index
+                break
+        # Count the bigrams in the question
+        questionBigrams = generateBigramsFromSent(self.sentences[self.questionIndices[questionNumber]])
+        for i, qb in enumerate(questionBigrams):
+            if qb in bigramIndices:
+                bigramIndices[qb].append(i)
+            else:
+                warnings.warn("Bigram not in bigram dictionary: " + str(qb))
+
+        for i, b in enumerate(bigrams):
+            featureVector[i] = uniqueMapping(bigramIndices[b])
+        return featureVector
+
+
+    def constructBigramOrderPoints(self, bigrams):
+        n = len(self.questionIndices)
+        M = len(bigrams)
+        points = np.empty([n, M], dtype='uint8')
+        for i in range(n):
+            points[i] = self.constructBigramFeaturesBefore(i, bigrams)
+        return points
+
+
+
+
+
+
+
+
     def constructPoints(self, dictionary, bagOfWords=False):
         '''
             dictionary - python list of words
