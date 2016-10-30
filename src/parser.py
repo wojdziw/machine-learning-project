@@ -80,6 +80,7 @@ def parseAll():
     trainData_bgr = np.zeros([1,len(bigrams)]) # as bag-of-words
     trainData_bgrF = np.zeros([1,len(bigramsFound)]) # as bag-of-words
     trainData_trgrF = np.zeros([1,len(trigramsFound)]) # as bag-of-words
+    trainData_bgr_order = np.zeros([1,len(bigrams)]) # as bag-of-words
     trainLabels = np.zeros([1, len(dictionary)])
     trainLabelsAns = np.zeros([1, len(ansLabels)])
 
@@ -92,13 +93,14 @@ def parseAll():
         points_bgr = story.constructBigramPoints(bigrams)
         points_bgrF = story.constructBigramPoints(bigramsFound)
         points_trgrF = story.constructTrigramPoints(trigramsFound)
+        points_bgr_order = story.constructBigramOrderPoints(bigrams)
 
         trainData_um = np.concatenate((trainData_um, points_um), axis = 0)
         trainData_bow = np.concatenate((trainData_bow, points_bow), axis = 0)
         trainData_bgr = np.concatenate((trainData_bgr, points_bgr), axis = 0)
         trainData_bgrF = np.concatenate((trainData_bgrF, points_bgrF), axis = 0)
         trainData_trgrF = np.concatenate((trainData_trgrF, points_trgrF), axis = 0)
-
+        trainData_bgr_order = np.concatenate((trainData_bgr, points_bgr_order), axis = 0)
         labels = story.constructBinaryLabels(dictionary)
         labelsAns = story.constructBinaryLabels(ansLabels)
         trainLabels = np.concatenate((trainLabels, labels), axis = 0)
@@ -109,6 +111,8 @@ def parseAll():
     trainData_bgr = trainData_bgr[1:]
     trainData_bgrF = trainData_bgrF[1:]
     trainData_trgrF = trainData_trgrF[1:]
+    trainData_bgr_order = trainData_bgr_order[1:]
+
     trainLabels = trainLabels[1:]
     trainLabelsAns = trainLabelsAns[1:]
 
@@ -120,6 +124,9 @@ def parseAll():
     testData_bgr = np.zeros([1,len(bigrams)])
     testData_bgrF = np.zeros([1,len(bigramsFound)])
     testData_trgrF = np.zeros([1,len(trigramsFound)])
+    testData_bgr_order = np.zeros([1,len(bigrams)])
+
+    testLabels = np.zeros([1, len(dictionary)])
 
     print ("Producing the test data points and labels...")
 
@@ -129,18 +136,26 @@ def parseAll():
         points_bgr = story.constructBigramPoints(bigrams)
         points_bgrF = story.constructBigramPoints(bigramsFound)
         points_trgrF = story.constructTrigramPoints(trigramsFound)
+        points_bgr_order = story.constructBigramOrderPoints(bigrams)
 
         testData_um = np.concatenate((testData_um, points_um), axis = 0)
         testData_bow = np.concatenate((testData_bow, points_bow), axis = 0)
         testData_bgr = np.concatenate((testData_bgr, points_bgr), axis = 0)
         testData_bgrF = np.concatenate((testData_bgrF, points_bgrF), axis = 0)
         testData_trgrF = np.concatenate((testData_trgrF, points_trgrF), axis = 0)
+        testData_bgr_order = np.concatenate((testData_bgr_order, points_bgr_order), axis=0)
+
+        labels = story.constructBinaryLabels(dictionary)
+        testLabels = np.concatenate((testLabels, labels), axis = 0)
 
     testData_um = testData_um[1:]
     testData_bow = testData_bow[1:]
     testData_bgr = testData_bgr[1:]
     testData_bgrF = testData_bgrF[1:]
     testData_trgrF = testData_trgrF[1:]
+    testData_bgr_order = testData_bgr_order[1:]
+
+    testLabels = testLabels[1:]
 
 
     # Save everything to files
@@ -150,12 +165,13 @@ def parseAll():
     np.save(BIGRAMS_FILE, bigrams)
     np.save(BIGRAMS_FOUND_FILE, bigramsFound)
     np.save(TRIGRAMS_FOUND_FILE, trigramsFound)
-    #
+
     np.save(TRAIN_DATA_UM_FILE, trainData_um)
     np.save(TRAIN_DATA_BOW_FILE, trainData_bow)
     np.save(TRAIN_DATA_BGR_FILE, trainData_bgr)
     np.save(TRAIN_DATA_BGR_FOUND_FILE, trainData_bgrF)
     np.save(TRAIN_DATA_TRGR_FOUND_FILE, trainData_trgrF)
+    np.save(TRAIN_DATA_BGR_ORDER_FILE, trainData_bgr_order)
     np.save(TRAIN_LABELS_FILE, trainLabels)
     np.save(TRAIN_LABELS_ANS_FILE, trainLabelsAns)
     np.save(TRAIN_STORIES_FILE, np.array(stories))
@@ -165,6 +181,7 @@ def parseAll():
     np.save(TEST_DATA_BGR_FILE, testData_bgr)
     np.save(TEST_DATA_BGR_FOUND_FILE, testData_bgrF)
     np.save(TEST_DATA_TRGR_FOUND_FILE, testData_trgrF)
+    np.save(TEST_DATA_BGR_ORDER_FILE, testData_bgr_order)
     np.save(TEST_STORIES_FILE, np.array(testStories))
 
 # parseAll()
