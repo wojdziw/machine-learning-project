@@ -64,40 +64,41 @@ def reverseCantorMapping(mapping):
 
 
 def mltBinaryAccuracy(labels, predictions):
-	'''
-		Gives us overall acc as well as acc on different types of quesitons.
-		labels[0] and predictions[0] correspond to 'nothing'
-	'''
-	correct = 0.0
-	nothings = 0.0
-	nothings_c = 0.0
-	multilabel = 0.0
-	multilabel_c = 0.0
-	singlelabel = 0.0
-	singlelabel_c = 0.0
-	for i in range(labels.shape[0]):
-
-		isCorrect =  np.all(labels[i] == predictions[i])
-		if isCorrect:
-			correct += 1
-		if labels[i][0] > 0:
-			nothings += 1
-			if isCorrect:
-				nothings_c += 1
-		elif np.sum(labels[i]) > 1.5:
-			multilabel += 1
-			if isCorrect:
-				multilabel_c += 1
-		else: # single
-			singlelabel += 1
-			if isCorrect:
-				singlelabel_c += 1
-	nothing_acc = nothings_c / nothings
-	multilabel_acc = multilabel_c / multilabel
-	singlelabel_acc = singlelabel_c / singlelabel
-	if nothings + multilabel + singlelabel != labels.shape[0]:
-		print("WTFFFF: ", str(labels.shape[0] - nothings - multilabel - singlelabel))
-	return correct / len(labels), nothing_acc, multilabel_acc, singlelabel_acc
+    '''
+        Gives us overall acc as well as acc on different types of quesitons.
+        labels[0] and predictions[0] correspond to 'nothing'
+    '''
+    correct = 0.0
+    nothings = 0.0
+    nothings_c = 0.0
+    multilabel = 0.0
+    multilabel_c = 0.0
+    singlelabel = 0.0
+    singlelabel_c = 0.0
+    for i in range(labels.shape[0]):
+        isCorrect =  np.all(labels[i] == predictions[i])
+        if isCorrect:
+            correct += 1
+        if labels[i][0] > 0:
+            nothings += 1
+            if isCorrect:
+                nothings_c += 1
+        elif np.sum(labels[i]) > 1.5:
+            multilabel += 1
+            if isCorrect:
+                multilabel_c += 1
+        else: # single
+            singlelabel += 1
+            if isCorrect:
+                singlelabel_c += 1
+    nothing_acc = nothings_c / nothings
+    multilabel_acc = multilabel_c / multilabel
+    singlelabel_acc = singlelabel_c / singlelabel
+    assert nothings + multilabel + singlelabel == labels.shape[0], "Sth's fishy"
+    assert nothings_c + multilabel_c + singlelabel_c == correct, "Sth's fishy"
+    if nothings + multilabel + singlelabel != labels.shape[0]:
+        print("WTFFFF: ", str(labels.shape[0] - nothings - multilabel - singlelabel))
+    return correct / len(labels), nothing_acc, multilabel_acc, singlelabel_acc
 
 
 def writeToCsv(outLabels, testStories, dictionary, outFile):
@@ -106,6 +107,7 @@ def writeToCsv(outLabels, testStories, dictionary, outFile):
     '''
     mainString = 'textID,sortedAnswerList'
     out_index = 0
+    missing_predicted = 0
     for i, st in enumerate(testStories):
         for qi in range(1, len(st.questionIndices) + 1):
             line = str(i + 1) + "_" + str(qi) + "," # a single line in our csv
@@ -117,13 +119,19 @@ def writeToCsv(outLabels, testStories, dictionary, outFile):
                 if res == 1: # we predict dictionary[j]
                     predicted = dictionary[j]
                     # make sure we're not predicting a word that's not in the story
-                    assert predicted in st.wordToNumHash, "WORD THAT IS NOT IN STORY PREDICTED: " + predicted + " is not in story " + str(i) + " with question index " + str(qi)
-                    predictions.append(st.wordToNumHash[dictionary[j]])
-                    writtenSth = True
-                    assert st.wordToNumHash[dictionary[j]] == -1 or (not writtenN), "Writing Nothing and sth else!" # make sure we're not wrinig 'nothing' and sth else
-                    if st.wordToNumHash[dictionary[j]] == -1:
-                        writtenN = True
-            assert writtenSth, "No answers written for question " + str(out_index) # make sure we've written std
+                    # assert predicted in st.wordToNumHash, "WORD THAT IS NOT IN STORY PREDICTED: " + predicted + " is not in story " + str(i) + " with question index " + str(qi)
+                    if predicted in st.wordToNumHash:
+                        predictions.append(st.wordToNumHash[dictionary[j]])
+                        writtenSth = True
+                        assert st.wordToNumHash[dictionary[j]] == -1 or (not writtenN), "Writing Nothing and sth else!" # make sure we're not wrinig 'nothing' and sth else
+                        if st.wordToNumHash[dictionary[j]] == -1:
+                            writtenN = True
+                    else:
+                        missing_predicted += 1
+            # assert writtenSth, "No answers written for question " + str(out_index) # make sure we've written std
+            if not writtenSth:
+                predictions = [-1]
+            assert len(predictions) > 0, "Empty predictions for " + str(i) + " " + str(qi)
             predictions.sort() # we need to output sorted indices
             for p in predictions:
                 line += str(p) + " "
@@ -132,3 +140,16 @@ def writeToCsv(outLabels, testStories, dictionary, outFile):
     f = open(outFile, "w")
     f.write(mainString)
     f.close()
+    print("Written to " + outFile + " - " + str(missing_predicted) + " predictions of words that were not in the story are replaced with -1")
+
+def generateAllPossibleBigrams(words):
+    bigrams = []
+    for i in range(1, len(words)):
+        bigrams += list(zip(words, words[i:] + words[:i]))
+    assert len(bigrams) == (len(words) * (len(words) - 1)),  "Bigram list length is not correct: " + str(len(bigrams))
+    return bigrams
+
+def generateBigramsFromSent(sentence):
+    bigrams = list(zip(sentence, sentence[1:]))
+    assert len(bigrams) == len(sentence) - 1 or len(sentence) == 0, "Wrong bigram count"
+    return bigrams

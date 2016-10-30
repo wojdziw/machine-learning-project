@@ -2,6 +2,7 @@ from itertools import *
 import numpy as np
 import copy
 import math
+import warnings
 from utils import *
 
 class Story:
@@ -100,10 +101,9 @@ class Story:
 
     def constructBagOfWordsFeaturesBefore(self, questionNumber, words):
         '''
-            Returns a 1xN numpy array containig the values for each word in the
-            dictionary based on the indices of occurence of that word in the
-            statements before question no. *questionNumber* as well as in that
-            question
+            Returns a 1xN numpy array containig the number of occurences of
+            each word in the statements before question no. *questionNumber*
+            as well as in that question
         '''
         featureVector = np.empty(len(words))
         for i, w in enumerate(words):
@@ -114,6 +114,40 @@ class Story:
             else:
                 featureVector[i] = 0
         return featureVector
+
+    def constructBigramFeaturesBefore(self, questionNumber, bigrams):
+        bigramCounts = dict(zip(bigrams, repeat(0)))
+        featureVector = np.empty(len(bigrams), dtype='uint8')
+        for si in self.statementIndices:
+            if si < self.questionIndices[questionNumber]: # look only at statements before question *questionNumber*
+                statementBigrams = generateBigramsFromSent(self.sentences[si])
+                for sb in statementBigrams:
+                    if sb in bigramCounts:
+                        bigramCounts[sb] += 1
+                    else:
+                        warnings.warn("Bigram not in bigram dictionary: " + str(sb))
+            else: # exit the loop if we reached the question index
+                break
+        # Count the bigrams in the question
+        questionBigrams = generateBigramsFromSent(self.sentences[self.questionIndices[questionNumber]])
+        for qb in questionBigrams:
+            if qb in bigramCounts:
+                bigramCounts[qb] += 1
+            else:
+                warnings.warn("Bigram not in bigram dictionary: " + str(qb))
+
+        for i, b in enumerate(bigrams):
+            featureVector[i] = bigramCounts[b]
+        return featureVector
+
+
+    def constructBigramPoints(self, bigrams):
+        n = len(self.questionIndices)
+        M = len(bigrams)
+        points = np.empty([n, M], dtype='uint8')
+        for i in range(n):
+            points[i] = self.constructBigramFeaturesBefore(i, bigrams)
+        return points
 
 
     def constructPoints(self, dictionary, bagOfWords=False):
