@@ -7,6 +7,7 @@ from utils import *
 from MLPC import *
 from TwoStagePredictor import *
 from GBC import *
+from validation import *
 
 # cl = TwoStagePredictor()
 cl = MLPC()
@@ -26,10 +27,11 @@ testData_bow = np.load(TEST_DATA_BOW_FILE)
 testData_bgr = np.load(TEST_DATA_BGR_FILE)
 testStories = np.load(TEST_STORIES_FILE).tolist()
 
-print("Training classifier...")
+print("Training classifier with validation...")
 # cl.fit(trainData_bow, trainLabels)
 # cl.fit(trainData_um, trainLabels)
-cl.fit(trainData_bgr, trainLabels)
+# cl.fit(trainData_bgr, trainLabels)
+cl = validation(cl, trainData_bgr, trainLabels)
 
 print("Predicting...")
 # output = cl.predict(testData_bow)
