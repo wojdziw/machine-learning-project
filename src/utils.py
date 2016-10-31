@@ -11,6 +11,7 @@ def uniqueMapping(indexes):
     elif indexes[0] == -1:
         return -1
     elif len(indexes) == 1:
+        return indexes[0]
         a = indexes[0]
         b = 0
     elif len(indexes) == 2:
