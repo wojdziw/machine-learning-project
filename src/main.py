@@ -1,62 +1,43 @@
 from parser import *
 from Story import *
-from sklearn import svm
 import numpy as np
 from constants import *
 from utils import *
 from MLPC import *
-from TwoStagePredictor import *
-from GBC import *
+from validation import validation
+###############
+# Change the lines in this block to tweak your test
 
-# cl = TwoStagePredictor()
+param_grid = {
+    'activation': ['relu'],
+    'alpha': [5.0, 6.0],
+    'hidden_layer_sizes': [(10,)]}#, (20,), (30,), (40,), (50,), (60,)]}
+
 cl = MLPC()
-clName = "mlpc_bgr_hlz12_а10е-4" # used to save the classifier
 
+# Make sure you change the name below to sth meaningful, so we have a record
+# of the models we have tried
+clName = "mlpc_validated" # used to save the classifier
+
+##############
 
 print("Loading data from .npy files...")
-trainData_um = np.load(TRAIN_DATA_UM_FILE)
-trainData_bow = np.load(TRAIN_DATA_BOW_FILE)
-trainData_bgr = np.load(TRAIN_DATA_BGR_FILE)
-trainData_bgr_order = np.load(TRAIN_DATA_BGR_ORDER_FILE)
+trainData_trgr_f = np.load(TRAIN_DATA_TRGR_FOUND_FILE)
+trainLabelsAns = np.load(TRAIN_LABELS_ANS_FILE)
+answer_dictionary = np.load(ANSWER_DICTIONARY_FILE).tolist()
 
-trainLabels = np.load(TRAIN_LABELS_FILE)
-trainStories = np.load(TRAIN_STORIES_FILE).tolist()
-dictionary = np.load(DICTIONARY_FILE).tolist()
-
-testData_um = np.load(TEST_DATA_UM_FILE)
-testData_bow = np.load(TEST_DATA_BOW_FILE)
-testData_bgr = np.load(TEST_DATA_BGR_FILE)
-testData_bgr_order = np.load(TEST_DATA_BGR_ORDER_FILE)
-
+testData_trgr_f = np.load(TEST_DATA_TRGR_FOUND_FILE)
 testStories = np.load(TEST_STORIES_FILE).tolist()
 
-print("Training classifier...")
-# cl.fit(trainData_bow, trainLabels)
-# cl.fit(trainData_um, trainLabels)
-# cl.fit(trainData_bgr, trainLabels)
-cl.fit(trainData_bgr_order, trainLabels)
+print("Training classifier, running cross-validation...")
+cl = validation(cl, trainData_trgr_f, trainLabelsAns, param_grid)
 
 print("Predicting...")
-# output = cl.predict(testData_bow)
-# output = cl.predict(testData_um)
-# output = cl.predict(testData_bgr)
-output = cl.predict(testData_bgr_order)
-
-# in_sample = cl.predict(trainData_bow)
-# in_sample = cl.predict(trainData_um)
-# in_sample = cl.predict(trainData_bgr)
-in_sample = cl.predict(trainData_bgr_order)
-
-print("Accuracies in: [overall] [nothings] [multilabel] [singlelabel]")
-print(mltBinaryAccuracy(trainLabels, in_sample))
-#
-# for i in range(20):
-# 	print(i)
-# 	print(list(zip(dictionary,output[i].tolist())))
+output = cl.predict(testData_trgr_f)
 
 # save model
 print("Saving model...")
 np.save('../models/main_' + clName + "_" + timestamp_str, np.array([cl]))
 
 print("Writing answers to csv...")
-writeToCsv(output, testStories, dictionary, ANSWERS_CSV_FILE)
+writeToCsv(output, testStories, answer_dictionary, ANSWERS_CSV_FILE)
