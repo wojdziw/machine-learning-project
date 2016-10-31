@@ -80,7 +80,7 @@ def parseAll():
     trainData_bgr = np.zeros([1,len(bigrams)]) # as bag-of-words
     trainData_bgrF = np.zeros([1,len(bigramsFound)]) # as bag-of-words
     trainData_trgrF = np.zeros([1,len(trigramsFound)]) # as bag-of-words
-    trainData_bgr_order = np.zeros([1,len(bigrams)]) # as bag-of-words
+    trainData_bgr_order = np.zeros([1,len(bigramsFound)]) # as bag-of-words
     trainLabels = np.zeros([1, len(dictionary)])
     trainLabelsAns = np.zeros([1, len(ansLabels)])
 
@@ -93,14 +93,14 @@ def parseAll():
         points_bgr = story.constructBigramPoints(bigrams)
         points_bgrF = story.constructBigramPoints(bigramsFound)
         points_trgrF = story.constructTrigramPoints(trigramsFound)
-        points_bgr_order = story.constructBigramOrderPoints(bigrams)
+        points_bgr_order = story.constructBigramOrderPoints(bigramsFound)
 
         trainData_um = np.concatenate((trainData_um, points_um), axis = 0)
         trainData_bow = np.concatenate((trainData_bow, points_bow), axis = 0)
         trainData_bgr = np.concatenate((trainData_bgr, points_bgr), axis = 0)
         trainData_bgrF = np.concatenate((trainData_bgrF, points_bgrF), axis = 0)
         trainData_trgrF = np.concatenate((trainData_trgrF, points_trgrF), axis = 0)
-        trainData_bgr_order = np.concatenate((trainData_bgr, points_bgr_order), axis = 0)
+        trainData_bgr_order = np.concatenate((trainData_bgr_order, points_bgr_order), axis = 0)
         labels = story.constructBinaryLabels(dictionary)
         labelsAns = story.constructBinaryLabels(ansLabels)
         trainLabels = np.concatenate((trainLabels, labels), axis = 0)
@@ -124,7 +124,7 @@ def parseAll():
     testData_bgr = np.zeros([1,len(bigrams)])
     testData_bgrF = np.zeros([1,len(bigramsFound)])
     testData_trgrF = np.zeros([1,len(trigramsFound)])
-    testData_bgr_order = np.zeros([1,len(bigrams)])
+    testData_bgr_order = np.zeros([1,len(bigramsFound)])
 
     print ("Producing the test data points and labels...")
 
@@ -134,7 +134,7 @@ def parseAll():
         points_bgr = story.constructBigramPoints(bigrams)
         points_bgrF = story.constructBigramPoints(bigramsFound)
         points_trgrF = story.constructTrigramPoints(trigramsFound)
-        points_bgr_order = story.constructBigramOrderPoints(bigrams)
+        points_bgr_order = story.constructBigramOrderPoints(bigramsFound)
 
         testData_um = np.concatenate((testData_um, points_um), axis = 0)
         testData_bow = np.concatenate((testData_bow, points_bow), axis = 0)

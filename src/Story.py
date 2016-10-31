@@ -117,7 +117,7 @@ class Story:
         return featureVector
 
     def constructBigramFeaturesBefore(self, questionNumber, bigrams):
-        bigramCounts = dict(zip([tuple(b) for b in bigrams.tolist()], repeat(0)))
+        bigramCounts = dict(zip(bigrams, repeat(0)))
         featureVector = np.empty(len(bigrams), dtype='uint8')
         for si in self.statementIndices:
             if si < self.questionIndices[questionNumber]: # look only at statements before question *questionNumber*
@@ -191,7 +191,7 @@ class Story:
 
 
     def constructBigramOrderFeaturesBefore(self, questionNumber, bigrams):
-        bigramIndices = dict(zip([tuple(b) for b in bigrams.tolist()], repeat([])))
+        bigramIndices = dict(zip(bigrams, repeat([])))
         for big in bigramIndices:
             bigramIndices[big] = []
 
