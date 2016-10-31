@@ -5,6 +5,7 @@ import math
 import warnings
 from utils import *
 
+
 class Story:
     def __init__(self):
         self.wordToNumHash = dict()   # one-based
@@ -157,22 +158,27 @@ class Story:
 
     def constructBigramOrderFeaturesBefore(self, questionNumber, bigrams):
         bigramIndices = dict(zip([tuple(b) for b in bigrams.tolist()], repeat([])))
-        featureVector = np.empty(len(bigrams), dtype='uint8')
+        for big in bigramIndices:
+            bigramIndices[big] = []
+
+        featureVector = np.empty(len(bigrams))
+        bigramsBefore = 0
         for si in self.statementIndices:
             if si < self.questionIndices[questionNumber]: # look only at statements before question *questionNumber*
                 statementBigrams = generateBigramsFromSent(self.sentences[si])
                 for i, sb in enumerate(statementBigrams):
                     if sb in bigramIndices:
-                        bigramIndices[sb].append(i)
+                        bigramIndices[sb].append(i+bigramsBefore)
                     else:
                         warnings.warn("Bigram not in bigram dictionary: " + str(sb))
+                bigramsBefore += len(statementBigrams)
             else: # exit the loop if we reached the question index
                 break
         # Count the bigrams in the question
         questionBigrams = generateBigramsFromSent(self.sentences[self.questionIndices[questionNumber]])
         for i, qb in enumerate(questionBigrams):
             if qb in bigramIndices:
-                bigramIndices[qb].append(i)
+                bigramIndices[qb].append(i+bigramsBefore)
             else:
                 warnings.warn("Bigram not in bigram dictionary: " + str(qb))
 
