@@ -153,3 +153,8 @@ def generateBigramsFromSent(sentence):
     bigrams = list(zip(sentence, sentence[1:]))
     assert len(bigrams) == len(sentence) - 1 or len(sentence) == 0, "Wrong bigram count"
     return bigrams
+
+def generateTrigramsFromSent(sentence):
+    trigrams = list(zip(sentence, sentence[1:], sentence[2:]))
+    assert len(trigrams) == len(sentence) - 2 or len(sentence) == 0, "Wrong bigram count"
+    return trigrams

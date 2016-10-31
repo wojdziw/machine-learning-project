@@ -149,6 +149,40 @@ class Story:
             points[i] = self.constructBigramFeaturesBefore(i, bigrams)
         return points
 
+    def constructTrigramFeaturesBefore(self, questionNumber, trigrams):
+        trigramCounts = dict(zip(trigrams, repeat(0)))
+        featureVector = np.empty(len(trigrams), dtype='uint8')
+        for si in self.statementIndices:
+            if si < self.questionIndices[questionNumber]: # look only at statements before question *questionNumber*
+                statementTrigrams = generateTrigramsFromSent(self.sentences[si])
+                for sb in statementTrigrams:
+                    if sb in trigramCounts:
+                        trigramCounts[sb] += 1
+                    else:
+                        warnings.warn("Trigram not in trigram dictionary: " + str(sb))
+            else: # exit the loop if we reached the question index
+                break
+        # Count the trigrams in the question
+        questionTrigrams = generateTrigramsFromSent(self.sentences[self.questionIndices[questionNumber]])
+        for qb in questionTrigrams:
+            if qb in trigramCounts:
+                trigramCounts[qb] += 1
+            else:
+                warnings.warn("Trigram not in trigram dictionary: " + str(qb))
+
+        for i, b in enumerate(trigrams):
+            featureVector[i] = trigramCounts[b]
+        return featureVector
+
+
+    def constructTrigramPoints(self, trigrams):
+        n = len(self.questionIndices)
+        M = len(trigrams)
+        points = np.empty([n, M], dtype='uint8')
+        for i in range(n):
+            points[i] = self.constructTrigramFeaturesBefore(i, trigrams)
+        return points
+
 
     def constructPoints(self, dictionary, bagOfWords=False):
         '''
